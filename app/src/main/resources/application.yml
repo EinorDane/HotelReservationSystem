@@ -1,0 +1,12 @@
+spring:
+  config:
+    import: classpath:db.properties
+  datasource:
+    url: ${db.url}
+    username: ${db.user}
+    password: ${db.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
