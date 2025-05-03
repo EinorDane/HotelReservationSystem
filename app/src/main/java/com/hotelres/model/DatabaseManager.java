@@ -758,7 +758,8 @@ public class DatabaseManager {
                              resultSet.getString("RoomNumber"),
                              resultSet.getString("RoomType"),
                              resultSet.getInt("Capacity"),
-                             resultSet.getDouble("RatePerNight")
+                             resultSet.getDouble("RatePerNight"),
+                             resultSet.getBoolean("Reserved")
                          );
                          availableRooms.add(room);
                      } catch (Exception e) {

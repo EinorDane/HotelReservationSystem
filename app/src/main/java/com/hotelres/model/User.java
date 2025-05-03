@@ -1,17 +1,19 @@
 package com.hotelres.model;
 
 public class User {
-    private int userId;    // Unique identifier for the user
+    private int userId;
     private String username;
-    private String password; // Consider hashing for security
-    private String role;    // "guest" or "staff"
+    private String password; // Stored as hashed
+    private String role; // "guest" or "staff"
+    private String salt; // Unique salt for each user
 
     // Constructor
-    public User(int userId, String username, String password, String role) {
+    public User(int userId, String username, String password, String role, String salt) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.salt = salt;
     }
 
     // Getters and Setters
@@ -23,4 +25,6 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getSalt() { return salt; }
+    public void setSalt(String salt) { this.salt = salt; }
 }

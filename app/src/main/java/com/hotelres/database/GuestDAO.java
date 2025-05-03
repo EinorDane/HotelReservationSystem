@@ -1,12 +1,15 @@
 package com.hotelres.database;
 
 import com.hotelres.model.Guest;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class GuestDAO {
+
     // Method to add a new guest (Now includes UserID)
     public int addGuest(Guest guest) throws SQLException {
         String sql = "INSERT INTO Guests (GuestName, Address, PhoneNumber, EmailAddress, UserID) VALUES (?, ?, ?, ?, ?)";
@@ -29,7 +32,7 @@ public class GuestDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error adding guest: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
 
@@ -43,12 +46,12 @@ public class GuestDAO {
 
             while (rs.next()) {
                 Guest guest = new Guest(
-                    rs.getInt("GuestID"),
-                    rs.getString("GuestName"),
-                    rs.getString("Address"),
-                    rs.getString("PhoneNumber"),
-                    rs.getString("EmailAddress"),
-                    rs.getInt("UserID") // Added UserID retrieval
+                        rs.getInt("GuestID"),
+                        rs.getString("GuestName"),
+                        rs.getString("Address"),
+                        rs.getString("PhoneNumber"),
+                        rs.getString("EmailAddress"),
+                        rs.getInt("UserID") // Added UserID retrieval
                 );
                 guests.add(guest);
             }

@@ -19,16 +19,45 @@ public class Guest {
     }
 
     // Getters and Setters
-    public int getGuestId() { return guestId; }
-    public void setGuestId(int guestId) { this.guestId = guestId; }
-    public String getGuestName() { return guestName; }
-    public void setGuestName(String guestName) { this.guestName = guestName; }
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    public String getEmailAddress() { return emailAddress; }
-    public void setEmailAddress(String emailAddress) { this.emailAddress = emailAddress; }
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public int getGuestId() { 
+        return guestId; 
+    }
+    public void setGuestId(int guestId) { 
+        this.guestId = guestId; 
+    }
+    
+    public String getGuestName() { 
+        return guestName; 
+    }
+    public void setGuestName(String guestName) { 
+        this.guestName = guestName; 
+    }
+    
+    public String getAddress() { 
+        return address; 
+    }
+    public void setAddress(String address) { 
+        this.address = address; 
+    }
+    
+    public String getPhoneNumber() { 
+        return phoneNumber; 
+    }
+    public void setPhoneNumber(String phoneNumber) { 
+        this.phoneNumber = phoneNumber; 
+    }
+    
+    public String getEmailAddress() { 
+        return emailAddress; 
+    }
+    public void setEmailAddress(String emailAddress) { 
+        this.emailAddress = emailAddress; 
+    }
+    
+    public int getUserId() { 
+        return userId; 
+    }
+    public void setUserId(int userId) { 
+        this.userId = userId; 
+    }
 }

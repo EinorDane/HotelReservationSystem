@@ -1,39 +1,44 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import Reservations from './components/Reservation'; // Fixed incorrect import!
+// src/App.tsx
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import LandingPage from './components/LandingPage';
+import GuestLogin from './components/GuestLogin';
+import Signup from './components/Signup';
+import StaffLogin from './components/StaffLogin';
 
-function App() {
-  const [count, setCount] = useState(0);
+const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+const AppRoutes: React.FC = () => {
+  const location = useLocation();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Hotel Reservation System</h1>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><LandingPage /></PageWrapper>} />
+        <Route path="/login" element={<PageWrapper><GuestLogin /></PageWrapper>} />
+        <Route path="/signup" element={<PageWrapper><Signup /></PageWrapper>} />
+        <Route path="/staff-login" element={<PageWrapper><StaffLogin /></PageWrapper>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
-      {/* Added Reservations Component */}
-      <Reservations />
-
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+function App() {
+  return (
+    <Router>
+      <AppRoutes />
+    </Router>
   );
 }
 

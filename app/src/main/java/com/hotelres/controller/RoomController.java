@@ -12,10 +12,16 @@ public class RoomController {
 
     private final RoomDAO roomDAO = new RoomDAO();
 
-    // GET all available rooms
+    // GET all rooms
     @GetMapping
     public List<Room> getAllRooms() {
         return roomDAO.getAllRooms();
+    }
+
+    // GET only available rooms
+    @GetMapping("/available")
+    public List<Room> getAvailableRooms() {
+        return roomDAO.getAvailableRooms();
     }
 
     // POST a new room
