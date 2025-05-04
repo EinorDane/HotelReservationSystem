@@ -15,12 +15,12 @@ public class GuestController {
 
     private final GuestDAO guestDAO;
 
-    // Single constructor, no need for @Autowired here
+    // Single constructor; no need for @Autowired on a single-constructor class.
     public GuestController(GuestDAO guestDAO) {
         this.guestDAO = guestDAO;
     }
 
-    // GET all guests
+    // GET all guests (accessible only by staff)
     @GetMapping
     @PreAuthorize("hasRole('STAFF')")
     public ResponseEntity<List<Guest>> getAllGuests() {
@@ -28,7 +28,7 @@ public class GuestController {
         return ResponseEntity.ok(guests);
     }
 
-    // POST a new guest (guest registration can be public)
+    // POST a new guest (for guest registration)
     @PostMapping
     public ResponseEntity<String> addGuest(@RequestBody Guest guest) {
         try {
@@ -40,7 +40,7 @@ public class GuestController {
         }
     }
 
-    // PUT to update guest info
+    // PUT to update guest info (accessible only by staff)
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('STAFF')")
     public ResponseEntity<String> updateGuest(@PathVariable int id, @RequestBody Guest guest) {
@@ -49,7 +49,7 @@ public class GuestController {
         return ResponseEntity.ok("Guest updated successfully!");
     }
 
-    // DELETE a guest
+    // DELETE a guest (accessible only by staff)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('STAFF')")
     public ResponseEntity<String> deleteGuest(@PathVariable int id) {

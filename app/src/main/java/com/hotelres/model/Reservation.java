@@ -11,6 +11,11 @@ public class Reservation {
     private int numberOfGuests;
     private double totalCost;
 
+    // Default no-argument constructor (for JSON deserialization)
+    public Reservation() {
+    }
+
+    // Parameterized constructor
     public Reservation(int reservationId, int guestId, int roomId, Date checkInDate, Date checkOutDate, int numberOfGuests, double totalCost) {
         this.reservationId = reservationId;
         this.guestId = guestId;
@@ -21,8 +26,7 @@ public class Reservation {
         this.totalCost = totalCost;
     }
 
-    // Getters and setters for all fields...
-
+    // Getters and setters
     public int getReservationId() {
         return reservationId;
     }

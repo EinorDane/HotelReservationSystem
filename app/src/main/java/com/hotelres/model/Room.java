@@ -6,9 +6,13 @@ public class Room {
     private String roomType;
     private int capacity;
     private double ratePerNight;
-    private boolean reserved; // New field to indicate if the room is reserved
+    private boolean reserved;
 
-    // Six-parameter constructor (including 'reserved')
+    // Default constructor (for JSON deserialization)
+    public Room() {
+    }
+
+    // Parameterized constructor
     public Room(int roomId, String roomNumber, String roomType, int capacity, double ratePerNight, boolean reserved) {
         this.roomId = roomId;
         this.roomNumber = roomNumber;

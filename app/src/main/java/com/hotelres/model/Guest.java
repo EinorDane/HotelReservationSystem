@@ -6,9 +6,13 @@ public class Guest {
     private String address;
     private String phoneNumber;
     private String emailAddress;
-    private int userId; // Added UserID field
+    private int userId; // Links the guest profile to a User record
 
-    // Updated Constructor
+    // Default constructor (for JSON deserialization)
+    public Guest() {
+    }
+
+    // Parameterized constructor
     public Guest(int guestId, String guestName, String address, String phoneNumber, String emailAddress, int userId) {
         this.guestId = guestId;
         this.guestName = guestName;
@@ -18,46 +22,41 @@ public class Guest {
         this.userId = userId;
     }
 
-    // Getters and Setters
-    public int getGuestId() { 
-        return guestId; 
+    // Getters and setters
+    public int getGuestId() {
+        return guestId;
     }
-    public void setGuestId(int guestId) { 
-        this.guestId = guestId; 
+    public void setGuestId(int guestId) {
+        this.guestId = guestId;
     }
-    
-    public String getGuestName() { 
-        return guestName; 
+    public String getGuestName() {
+        return guestName;
     }
-    public void setGuestName(String guestName) { 
-        this.guestName = guestName; 
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
     }
-    
-    public String getAddress() { 
-        return address; 
+    public String getAddress() {
+        return address;
     }
-    public void setAddress(String address) { 
-        this.address = address; 
+    public void setAddress(String address) {
+        this.address = address;
     }
-    
-    public String getPhoneNumber() { 
-        return phoneNumber; 
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
-    public void setPhoneNumber(String phoneNumber) { 
-        this.phoneNumber = phoneNumber; 
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
-    
-    public String getEmailAddress() { 
-        return emailAddress; 
+    public String getEmailAddress() {
+        return emailAddress;
     }
-    public void setEmailAddress(String emailAddress) { 
-        this.emailAddress = emailAddress; 
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
-    
-    public int getUserId() { 
-        return userId; 
+    public int getUserId() {
+        return userId;
     }
-    public void setUserId(int userId) { 
-        this.userId = userId; 
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

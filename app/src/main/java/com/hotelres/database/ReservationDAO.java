@@ -1,33 +1,32 @@
 package com.hotelres.database;
 
 import com.hotelres.model.Reservation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Repository
 public class ReservationDAO {
-    private static final Logger LOGGER = Logger.getLogger(ReservationDAO.class.getName());
 
-    public void addReservation(Reservation reservation) {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReservationDAO.class);
+
+    public void addReservation(Reservation reservation) throws SQLException {
         String sql = "INSERT INTO Reservations (GuestID, RoomID, CheckInDate, CheckOutDate, NumberOfGuests, TotalCost) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setInt(1, reservation.getGuestId());
             pstmt.setInt(2, reservation.getRoomId());
-            // Convert java.util.Date to java.sql.Date:
             pstmt.setDate(3, new java.sql.Date(reservation.getCheckInDate().getTime()));
             pstmt.setDate(4, new java.sql.Date(reservation.getCheckOutDate().getTime()));
             pstmt.setInt(5, reservation.getNumberOfGuests());
             pstmt.setDouble(6, reservation.getTotalCost());
             pstmt.executeUpdate();
-
         } catch (SQLException e) {
-            LOGGER.severe("Error adding reservation: " + e.getMessage());
+            LOGGER.error("Error adding reservation: {}", e.getMessage());
+            throw e;
         }
     }
 
@@ -37,7 +36,6 @@ public class ReservationDAO {
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-
             while (rs.next()) {
                 reservations.add(new Reservation(
                         rs.getInt("ReservationID"),
@@ -50,43 +48,39 @@ public class ReservationDAO {
                 ));
             }
         } catch (SQLException e) {
-            LOGGER.severe("Error fetching reservations: " + e.getMessage());
+            LOGGER.error("Error fetching reservations: {}", e.getMessage());
+            throw new RuntimeException("Error fetching reservations", e);
         }
         return reservations;
     }
 
-    public void updateReservation(Reservation reservation) {
+    public void updateReservation(Reservation reservation) throws SQLException {
         String sql = "UPDATE Reservations SET GuestID = ?, RoomID = ?, CheckInDate = ?, CheckOutDate = ?, NumberOfGuests = ?, TotalCost = ? WHERE ReservationID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setInt(1, reservation.getGuestId());
             pstmt.setInt(2, reservation.getRoomId());
-            // Convert the dates:
             pstmt.setDate(3, new java.sql.Date(reservation.getCheckInDate().getTime()));
             pstmt.setDate(4, new java.sql.Date(reservation.getCheckOutDate().getTime()));
             pstmt.setInt(5, reservation.getNumberOfGuests());
             pstmt.setDouble(6, reservation.getTotalCost());
             pstmt.setInt(7, reservation.getReservationId());
             pstmt.executeUpdate();
-
         } catch (SQLException e) {
-            LOGGER.severe("Error updating reservation: " + e.getMessage());
+            LOGGER.error("Error updating reservation: {}", e.getMessage());
+            throw e;
         }
     }
 
-    public void deleteReservation(int reservationId) {
+    public void deleteReservation(int reservationId) throws SQLException {
         String sql = "DELETE FROM Reservations WHERE ReservationID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setInt(1, reservationId);
             pstmt.executeUpdate();
-
         } catch (SQLException e) {
-            LOGGER.severe("Error deleting reservation: " + e.getMessage());
+            LOGGER.error("Error deleting reservation: {}", e.getMessage());
+            throw e;
         }
     }
-
-    // ... existing getAvailableRoomIds() method remains unchanged ...
 }

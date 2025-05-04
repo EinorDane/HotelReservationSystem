@@ -1,7 +1,10 @@
 package com.hotelres.database;
 
 import com.hotelres.model.Room;
-import org.springframework.stereotype.Repository; // <-- Import the annotation
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +12,8 @@ import java.util.List;
 @Repository
 public class RoomDAO {
 
-    // Method to add a new room (with the Reserved field)
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoomDAO.class);
+
     public void addRoom(Room room) {
         String sql = "INSERT INTO Rooms (RoomNumber, RoomType, Capacity, RatePerNight, Reserved) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -21,11 +25,11 @@ public class RoomDAO {
             pstmt.setBoolean(5, room.isReserved());
             pstmt.executeUpdate();
         } catch (SQLException e) {
+            LOGGER.error("Error adding room: {}", e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // Method to get all rooms from the database
     public List<Room> getAllRooms() {
         List<Room> rooms = new ArrayList<>();
         String sql = "SELECT * FROM Rooms";
@@ -34,22 +38,22 @@ public class RoomDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Room room = new Room(
-                    rs.getInt("RoomID"),
-                    rs.getString("RoomNumber"),
-                    rs.getString("RoomType"),
-                    rs.getInt("Capacity"),
-                    rs.getDouble("RatePerNight"),
-                    rs.getBoolean("Reserved")   // Retrieve the reserved status from the DB
+                        rs.getInt("RoomID"),
+                        rs.getString("RoomNumber"),
+                        rs.getString("RoomType"),
+                        rs.getInt("Capacity"),
+                        rs.getDouble("RatePerNight"),
+                        rs.getBoolean("Reserved")
                 );
                 rooms.add(room);
             }
         } catch (SQLException e) {
+            LOGGER.error("Error fetching all rooms: {}", e.getMessage());
             e.printStackTrace();
         }
         return rooms;
     }
 
-    // New method: Return only available (not reserved) rooms
     public List<Room> getAvailableRooms() {
         List<Room> availableRooms = new ArrayList<>();
         String sql = "SELECT * FROM Rooms WHERE Reserved = false";
@@ -58,22 +62,22 @@ public class RoomDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Room room = new Room(
-                    rs.getInt("RoomID"),
-                    rs.getString("RoomNumber"),
-                    rs.getString("RoomType"),
-                    rs.getInt("Capacity"),
-                    rs.getDouble("RatePerNight"),
-                    rs.getBoolean("Reserved")
+                        rs.getInt("RoomID"),
+                        rs.getString("RoomNumber"),
+                        rs.getString("RoomType"),
+                        rs.getInt("Capacity"),
+                        rs.getDouble("RatePerNight"),
+                        rs.getBoolean("Reserved")
                 );
                 availableRooms.add(room);
             }
         } catch (SQLException e) {
+            LOGGER.error("Error fetching available rooms: {}", e.getMessage());
             e.printStackTrace();
         }
         return availableRooms;
     }
 
-    // Method to update a room, updating the Reserved flag as well
     public void updateRoom(Room room) {
         String sql = "UPDATE Rooms SET RoomNumber = ?, RoomType = ?, Capacity = ?, RatePerNight = ?, Reserved = ? WHERE RoomID = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -86,11 +90,11 @@ public class RoomDAO {
             pstmt.setInt(6, room.getRoomId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
+            LOGGER.error("Error updating room: {}", e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // Method to delete a room based on RoomID
     public void deleteRoom(int roomId) {
         String sql = "DELETE FROM Rooms WHERE RoomID = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -98,11 +102,11 @@ public class RoomDAO {
             pstmt.setInt(1, roomId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
+            LOGGER.error("Error deleting room: {}", e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // NEW: Method to retrieve a Room by its RoomID.
     public Room getRoomById(int roomId) {
         Room room = null;
         String sql = "SELECT * FROM Rooms WHERE RoomID = ?";
@@ -112,18 +116,42 @@ public class RoomDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     room = new Room(
-                        rs.getInt("RoomID"),
-                        rs.getString("RoomNumber"),
-                        rs.getString("RoomType"),
-                        rs.getInt("Capacity"),
-                        rs.getDouble("RatePerNight"),
-                        rs.getBoolean("Reserved")
+                            rs.getInt("RoomID"),
+                            rs.getString("RoomNumber"),
+                            rs.getString("RoomType"),
+                            rs.getInt("Capacity"),
+                            rs.getDouble("RatePerNight"),
+                            rs.getBoolean("Reserved")
                     );
                 }
             }
         } catch (SQLException e) {
+            LOGGER.error("Error retrieving room by ID: {}", e.getMessage());
             e.printStackTrace();
         }
         return room;
+    }
+
+    public boolean isRoomAvailable(int roomId, java.util.Date checkIn, java.util.Date checkOut) {
+        String sql = "SELECT COUNT(*) FROM Reservations " +
+                     "WHERE RoomID = ? " +
+                     "AND NOT (CheckOutDate <= ? OR CheckInDate >= ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, roomId);
+            pstmt.setDate(2, new java.sql.Date(checkIn.getTime()));
+            pstmt.setDate(3, new java.sql.Date(checkOut.getTime()));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count == 0;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Error checking room availability: {}", e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error checking room availability", e);
+        }
+        return false;
     }
 }
