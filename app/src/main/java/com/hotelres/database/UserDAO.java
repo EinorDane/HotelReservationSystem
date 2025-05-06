@@ -8,33 +8,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public class UserDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDAO.class);
+    // Use the same encoder as in other parts of the app
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // Check if a username already exists in the Users table.
-    public boolean doesUsernameExist(String username) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Users WHERE Username = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-            return rs.next() && rs.getInt(1) > 0;
-        }
-    }
-
-    // Register a new user using BCrypt for password encryption.
+    // Register a new user with proper BCrypt password encoding
     public int registerUser(User user) throws SQLException {
-        if (doesUsernameExist(user.getUsername())) {
-            LOGGER.warn("Username already exists: {}", user.getUsername());
-            return -1;
-        }
         String sql = "INSERT INTO Users (Username, Password, Role) VALUES (?, ?, ?)";
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-        String hashedPassword = encoder.encode(user.getPassword());
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        System.out.println("DEBUG: Registering user " + user.getUsername() + " with hashed password: " + hashedPassword);
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -52,27 +37,7 @@ public class UserDAO {
         return -1;
     }
 
-    // Retrieve all users (if needed)
-    public List<User> getAllUsers() throws SQLException {
-        List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM Users";
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                User user = new User(
-                        rs.getInt("UserID"),
-                        rs.getString("Username"),
-                        rs.getString("Password"),
-                        rs.getString("Role")
-                );
-                users.add(user);
-            }
-        }
-        return users;
-    }
-
-    // Find a user by username.
+    // Retrieve user by username and log password hash for debugging
     public User findByUsername(String username) throws SQLException {
         String sql = "SELECT * FROM Users WHERE Username = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -83,8 +48,12 @@ public class UserDAO {
                     User user = new User();
                     user.setUserId(rs.getInt("UserID"));
                     user.setUsername(rs.getString("Username"));
-                    user.setPassword(rs.getString("Password")); // BCrypt hash stored here.
+                    user.setPassword(rs.getString("Password")); // Stored BCrypt hash
                     user.setRole(rs.getString("Role"));
+
+                    // Log the retrieved hash so you can compare it
+                    System.out.println("DEBUG: Retrieved user -> Username: " + user.getUsername() +
+                                       " | Stored Password Hash: " + user.getPassword());
                     return user;
                 }
             }
@@ -95,13 +64,14 @@ public class UserDAO {
         return null;
     }
 
-    // Update a user's password (for demonstration; extend if additional fields need updating).
+    // Update the user's password, with extra logging
     public void updateUser(User user) throws SQLException {
-        String sql = "UPDATE Users SET Password = ? WHERE UserID = ?";
+        String sql = "UPDATE Users SET Password = ? WHERE Username = ?";
+        System.out.println("DEBUG: Updating user " + user.getUsername() + " with new hashed password: " + user.getPassword());
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getPassword());
-            pstmt.setInt(2, user.getUserId());
+            pstmt.setString(2, user.getUsername());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("Error updating user: {}", e.getMessage());

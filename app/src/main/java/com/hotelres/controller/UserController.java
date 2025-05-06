@@ -5,7 +5,7 @@ import com.hotelres.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;  // Import PasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -15,19 +15,21 @@ import java.sql.SQLException;
 public class UserController {
 
     private final UserDAO userDAO;
-    private final PasswordEncoder passwordEncoder; // Inject PasswordEncoder
+    private final PasswordEncoder passwordEncoder;
 
-    // Modify the constructor to inject both UserDAO and PasswordEncoder
+    // Inject both UserDAO and PasswordEncoder
     public UserController(UserDAO userDAO, PasswordEncoder passwordEncoder) {
         this.userDAO = userDAO;
         this.passwordEncoder = passwordEncoder;
     }
     
-    // GET endpoint for retrieving the authenticated user's profile.
+    // GET endpoint to retrieve the authenticated user's profile.
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
          Authentication auth = SecurityContextHolder.getContext().getAuthentication();
          String username = auth.getName();
+         System.out.println("DEBUG: Authenticated user -> " + username);
+
          try {
              User user = userDAO.findByUsername(username);
              if (user != null) {
@@ -40,20 +42,22 @@ public class UserController {
          }
     }
 
-    // PUT endpoint for updating the authenticated user's profile (e.g. password update).
+    // PUT endpoint to update the authenticated user's profile (e.g., password update).
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(@RequestBody User updatedUser) {
          Authentication auth = SecurityContextHolder.getContext().getAuthentication();
          String username = auth.getName();
+
          try {
              User existingUser = userDAO.findByUsername(username);
              if (existingUser == null) {
                  return ResponseEntity.status(404).body("User not found.");
              }
 
-             // Encode the new password using BCrypt before updating
+             // Encode and update the password
              String encodedPassword = passwordEncoder.encode(updatedUser.getPassword());
              existingUser.setPassword(encodedPassword);
+             System.out.println("DEBUG: New encoded password: " + encodedPassword);
 
              userDAO.updateUser(existingUser);
              return ResponseEntity.ok("Profile updated successfully.");

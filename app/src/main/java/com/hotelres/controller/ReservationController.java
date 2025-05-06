@@ -69,7 +69,7 @@ public class ReservationController {
             return ResponseEntity.internalServerError().body("SQL Error retrieving user: " + e.getMessage());
         }
         if (authUser == null) {
-            System.out.println("nigger");
+            System.out.println("TEST");
             return ResponseEntity.status(401).body("Authenticated user not found.");
         }
         // Retrieve the corresponding guest record for this user
