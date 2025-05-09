@@ -1,124 +1,155 @@
 import React, { useState } from 'react';
-import {
-  Container,
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-  IconButton
-} from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Link,
+  Alert,
+  CircularProgress,
+  MenuItem,
+} from '@mui/material';
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false); // ✅ Added loading state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    role: 'guest',
+  });
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setErrorMessage('Passwords do not match');
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
-    setLoading(true); // ✅ Indicate that signup is in progress
     try {
-      const payload = { username, password, role: 'guest' };
-      const response = await api.post('/users/signup', payload); // ✅ Removed `/api` (already set in `api.ts`)
-      
-      console.log('Signup successful:', response.data);
-      navigate('/dashboard'); // ✅ Navigate after signup
-    } catch (error: any) {
-      console.error('Signup error:', error);
-      setErrorMessage(error.response?.data?.message || 'Signup failed. Please try again.');
+      setLoading(true);
+      setError(null);
+      await api.signup(formData.username, formData.password, formData.role);
+      navigate('/login');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+      bgcolor="background.default"
     >
-      <Container maxWidth="sm" sx={{ mt: 8, mb: 8 }}>
-        <Paper sx={{ p: 4, position: 'relative' }} elevation={3}>
-          {/* Back Button */}
-          <IconButton
-            onClick={() => navigate(-1)}
-            aria-label="Go back"
-            sx={{ position: 'absolute', top: 8, left: 8 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          width: '100%',
+          maxWidth: 400,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <Typography variant="h4" component="h1" align="center" gutterBottom>
+          Sign Up
+        </Typography>
 
-          <Typography variant="h4" align="center" gutterBottom>
-            Create New Account
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            margin="normal"
+            required
+            disabled={loading}
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            margin="normal"
+            required
+            disabled={loading}
+          />
+          <TextField
+            fullWidth
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            margin="normal"
+            required
+            disabled={loading}
+          />
+          <TextField
+            fullWidth
+            select
+            label="Role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            margin="normal"
+            required
+            disabled={loading}
+          >
+            <MenuItem value="guest">Guest</MenuItem>
+            <MenuItem value="staff">Staff</MenuItem>
+          </TextField>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            size="large"
+            disabled={loading}
+            sx={{ mt: 2 }}
+          >
+            {loading ? <CircularProgress size={24} /> : 'Sign Up'}
+          </Button>
+        </form>
+
+        <Box textAlign="center" mt={2}>
+          <Typography variant="body2">
+            Already have an account?{' '}
+            <Link href="/login" underline="hover">
+              Login
+            </Link>
           </Typography>
-
-          <Box
-            component="form"
-            onSubmit={handleSignup}
-            sx={{
-              mt: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2
-            }}
-          >
-            <TextField
-              label="Username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              fullWidth
-            />
-            <TextField
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              fullWidth
-            />
-            <TextField
-              label="Confirm Password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              fullWidth
-            />
-            {errorMessage && (
-              <Typography variant="body2" color="error">
-                {errorMessage}
-              </Typography>
-            )}
-            <Button 
-              type="submit" 
-              variant="contained" 
-              color="primary" 
-              fullWidth 
-              disabled={loading} // ✅ Disable button during loading
-            >
-              {loading ? 'Signing Up...' : 'Sign Up'}
-            </Button>
-          </Box>
-        </Paper>
-      </Container>
-    </motion.div>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
-export default Signup;
+export default Signup; 

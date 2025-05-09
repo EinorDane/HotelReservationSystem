@@ -44,7 +44,7 @@ public class DBConnection {
             return connection;
         } catch (SQLException e) {
             System.err.println("Database connection failed: " + e.getMessage());
-            throw e;  // Keeps exception handling structured
+            throw e;
         }
     }
 }

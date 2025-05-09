@@ -8,7 +8,7 @@ public class Test2 {
         String rawPassword = "newSecret123";
 
         // Paste the latest stored hash from your database here
-        String storedHash = "$2a$10$/ldb5/J4H8ZxOY73nxmYOuZBKteUqvgN79L4B5yhmU/KkMvP.0byy";
+        String storedHash = "$2a$10$MB0bXgDVhWpkZYJg3TY.xecn41lwyKEPVIMPGIiTfUXm8OHT2QrKu";
 
         // Correctly compare raw password with stored hash
         boolean matches = encoder.matches(rawPassword, storedHash);

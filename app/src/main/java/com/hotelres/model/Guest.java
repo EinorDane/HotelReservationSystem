@@ -1,11 +1,25 @@
 package com.hotelres.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Guest {
+    
+    @JsonProperty("GuestID")
     private int guestId;
+    
+    @JsonProperty("GuestName")
     private String guestName;
+    
+    @JsonProperty("Address")
     private String address;
+    
+    @JsonProperty("PhoneNumber")
     private String phoneNumber;
+    
+    @JsonProperty("EmailAddress")
     private String emailAddress;
+    
+    @JsonProperty("UserID")
     private int userId; // Links the guest profile to a User record
 
     // Default constructor (for JSON deserialization)
@@ -22,7 +36,6 @@ public class Guest {
         this.userId = userId;
     }
 
-    // Getters and setters
     public int getGuestId() {
         return guestId;
     }

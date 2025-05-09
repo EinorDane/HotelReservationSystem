@@ -1,45 +1,72 @@
-// src/App.tsx
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import LandingPage from './components/LandingPage';
-import GuestLogin from './components/GuestLogin';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './assets-template/theme';
+import { AuthProvider } from './contexts/AuthContext';
+import DashboardLayout from './layouts-template/dashboard';
+import Home from './components/Home';
+import Login from './components/Login';
 import Signup from './components/Signup';
-import StaffLogin from './components/StaffLogin';
+import Dashboard from './components/Dashboard';
+import GuestList from './components/GuestList';
+import RoomList from './components/RoomList';
+import ReservationList from './components/ReservationList';
+import ProtectedRoute from './components/ProtectedRoute';
 
-const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
-    >
-      {children}
-    </motion.div>
-  );
-};
-
-const AppRoutes: React.FC = () => {
-  const location = useLocation();
-
-  return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PageWrapper><LandingPage /></PageWrapper>} />
-        <Route path="/login" element={<PageWrapper><GuestLogin /></PageWrapper>} />
-        <Route path="/signup" element={<PageWrapper><Signup /></PageWrapper>} />
-        <Route path="/staff-login" element={<PageWrapper><StaffLogin /></PageWrapper>} />
-      </Routes>
-    </AnimatePresence>
-  );
-};
-
-function App() {
-  return (
-    <Router>
-      <AppRoutes />
-    </Router>
-  );
-}
+const App: React.FC = () => (
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['staff']}>
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/guests"
+            element={
+              <ProtectedRoute allowedRoles={['staff']}>
+                <DashboardLayout>
+                  <GuestList />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rooms"
+            element={
+              <ProtectedRoute allowedRoles={['staff']}>
+                <DashboardLayout>
+                  <RoomList />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reservations"
+            element={
+              <ProtectedRoute allowedRoles={['staff', 'guest']}>
+                <DashboardLayout>
+                  <ReservationList />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  </ThemeProvider>
+);
 
 export default App;

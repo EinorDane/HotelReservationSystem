@@ -11,7 +11,7 @@ public class PasswordMatchTest {
         System.out.println("Encoded password: " + hashPasswordTest);
 
         // Paste the latest stored hash from your database here
-        String storedHash = "$2a$10$/ldb5/J4H8ZxOY73nxmYOuZBKteUqvgN79L4B5yhmU/KkMvP.0byy";
+        String storedHash = "$2a$10$MB0bXgDVhWpkZYJg3TY.xecn41lwyKEPVIMPGIiTfUXm8OHT2QrKu";
 
         boolean matches = encoder.matches(rawPassword, encoder.encode(rawPassword));
         System.out.println("Password matches? " + matches);

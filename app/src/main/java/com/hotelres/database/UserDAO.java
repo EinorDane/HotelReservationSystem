@@ -3,8 +3,6 @@ package com.hotelres.database;
 import com.hotelres.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -12,13 +10,12 @@ import java.sql.*;
 @Repository
 public class UserDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDAO.class);
-    // Use the same encoder as in other parts of the app
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // Register a new user with proper BCrypt password encoding
+    // Register a new user using the already encoded password
     public int registerUser(User user) throws SQLException {
         String sql = "INSERT INTO Users (Username, Password, Role) VALUES (?, ?, ?)";
-        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        // Do NOT encode again – use the password as provided by the controller.
+        String hashedPassword = user.getPassword();
         System.out.println("DEBUG: Registering user " + user.getUsername() + " with hashed password: " + hashedPassword);
 
         try (Connection conn = DBConnection.getConnection();
